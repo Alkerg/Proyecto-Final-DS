@@ -1,0 +1,49 @@
+services:
+
+  db:
+    image: postgres:16
+    container_name: db-container
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    ports:
+    - "5432:5432"
+    volumes: 
+    - db_data:/var/lib/postgresql/data
+    - ./initdb/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d postgres"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 30s
+
+
+
+  legacy-app:
+    build:
+      context: ./legacy-app
+    container_name: legacy-app-container
+    ports:
+    - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+
+  new-microservice:
+    build:
+      context: ./new-microservice
+    container_name: new-microservice-container
+    ports:
+    - "8081:8081"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+
+volumes:
+  db_data:

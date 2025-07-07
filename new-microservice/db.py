@@ -2,10 +2,10 @@ import psycopg2
 
 def get_db_connection():
     conn = psycopg2.connect(
-        host="localhost",
+        host="db",
         user="user",
         password="password",
-        database="mydatabase"
+        database="postgres"
     )
     return conn
 

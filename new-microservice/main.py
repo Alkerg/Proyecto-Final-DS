@@ -33,7 +33,7 @@ async def get_user(user_id: int):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM users WHERE id = %s", (user_id))
+        cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
         user = cursor.fetchone()
         conn.close()
         if user:
@@ -42,6 +42,10 @@ async def get_user(user_id: int):
             return {"error": "User not found"}
     except Exception as e:
         return {"error": str(e)}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
 
 @app.on_event("startup")
 async def startup():
