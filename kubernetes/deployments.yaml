@@ -1,0 +1,92 @@
+kind: Deployment
+metadata:
+  name: legacy-app
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: legacy-app
+        image: legacy-app:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: API_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: configmap
+              key: API_ENDPOINT
+
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: secret
+              key: POSTGRES_DB
+
+        - name: POSTGRES_USER
+          valueFrom:
+            SecretKeyRef:
+              name: secret
+              key: POSTGRES_USER
+
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            SecretKeyRef:
+              name: secret
+              key: POSTGRES_PASSWORD
+
+        - name: POSTGRES_DB
+          valueFrom:
+            SecretKeyRef:
+              name: secret
+              key: POSTGRES_DB
+
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+          
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config
+
+---
+
+kind: Deployment
+metadata:
+  name: legacy-app
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: new-microservice
+        image: new-microservice:latest
+        ports:
+        - containerPort: 8081
+        env:
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: secret
+              key: POSTGRES_DB
+
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: secret
+              key: POSTGRES_USER
+        
+        -name: POSTGRES_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: secret
+            key: POSTGRES_PASSWORD
+
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config
