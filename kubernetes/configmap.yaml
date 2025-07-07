@@ -1,0 +1,5 @@
+kind: configMap
+metadata:
+  name: configmap
+data:
+  API_ENDPOINT: "http://new-microservice:8081"
